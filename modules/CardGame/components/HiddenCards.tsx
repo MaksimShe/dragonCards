@@ -22,14 +22,38 @@ export const HiddenCards = () => {
   const cardsHidden = Array(6).fill(cardBackside);
 
   useEffect(() => {
+    if (hiddenCardsOrder.length > 0) {
+      hiddenCardsOrder.forEach((src) => {
+        const img = new window.Image();
+        img.src = src;
+      });
+    }
+  }, [hiddenCardsOrder]);
+
+  useEffect(() => {
     if (gameStatus === GameStatus.process) {
       playSound(SoundTypes.reveal)
       setFlippedCards(Array(6).fill(false));
-      setTimeout(() => {
-        setHiddenCardsOrder(shuffledCards());
-        setComponentKey(prev => prev + 1);
-      }, 350);
+
+      const newCards = shuffledCards();
+      setHiddenCardsOrder(newCards);
+
+      const preloadPromises = newCards.map((src) => {
+        return new Promise<void>((resolve) => {
+          const img = new window.Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = src;
+        });
+      });
+
+      Promise.all(preloadPromises).then(() => {
+        setTimeout(() => {
+          setComponentKey(prev => prev + 1);
+        }, 100);
+      });
     }
+
     if (gameStatus === GameStatus.opening) {
       flippedCards.forEach((_, index) => {
         setTimeout(() => {
@@ -42,6 +66,7 @@ export const HiddenCards = () => {
         }, index * 250);
       });
     }
+
     if (gameStatus === GameStatus.opened) {
       const result = calculateWin();
       if (result.includes(2) && !result.includes(0)) {
@@ -82,20 +107,19 @@ export const HiddenCards = () => {
                   alt="cardback"
                   fill
                   sizes="(max-width: 1024px) 20vw, 12vw"
-                  unoptimized
+                  priority
                   className="object-cover rounded-xl"
                 />
               </div>
 
               <div className="absolute w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
                 <Image
-                  src={hiddenCardsOrder[index] ? `${hiddenCardsOrder[index]}?t=${componentKey}` : card}
-                  alt={`card front ${card} ${index}`}
+                  src={hiddenCardsOrder[index] || card}
+                  alt={`card front ${index}`}
                   fill
                   sizes="(max-width: 1024px) 20vw, 12vw"
                   className="object-cover rounded-xl"
-                  unoptimized
-                  key={`${hiddenCardsOrder[index]}-${Date.now()}`}
+                  priority
                 />
               </div>
             </div>
