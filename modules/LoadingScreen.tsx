@@ -1,4 +1,6 @@
 import React from 'react';
+import Image from "next/image";
+import logoImg from '../public/icons/loader-logo.svg'
 
 interface LoadingScreenProps {
   progress: number;
@@ -8,12 +10,11 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
   return (
     <div className="fixed inset-0 bg-[var(--background)] flex flex-col items-center justify-center z-50">
       <div className="flex flex-col items-center gap-6">
-        {/* Dragon logo or game title */}
+        <Image src={logoImg} alt="loadingImg" width={180} height={70} priority/>
         <h1 className="text-4xl font-bold text-[var(--main-text-color)] font-['MedievalSharp']">
           Dragon Cards
         </h1>
 
-        {/* Loading bar */}
         <div className="w-64 h-2 bg-[var(--bet-input-bg-color)] rounded-full overflow-hidden">
           <div
             className="h-full bg-[var(--button-place-bet)] transition-all duration-300 ease-out"
@@ -21,12 +22,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
           />
         </div>
 
-        {/* Progress percentage */}
         <p className="text-[var(--secondary-text-color)] text-sm">
           Loading... {progress}%
         </p>
 
-        {/* Optional: spinning dragon or card animation */}
         <div className="animate-spin">
           <svg
             className="w-8 h-8 text-[var(--button-place-bet)]"
