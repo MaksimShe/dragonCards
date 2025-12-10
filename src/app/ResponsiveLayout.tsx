@@ -4,9 +4,16 @@ import { BetMenu } from "../../modules/BetMenu/BetMenu";
 import {CardGame} from "../../modules/CardGame/CargGame";
 import {useMediaQuery} from "react-responsive";
 import {Balance} from "../../modules/BetMenu/components/Balance";
+import {useImagePreloader} from "@/hooks/useImagePreloader";
+import {LoadingScreen} from "../../modules/LoadingScreen";
 
 export default function ResponsiveLayout() {
   const isDesktop = useMediaQuery({ minWidth: 1024 });
+  const { imagesLoaded, loadingProgress } = useImagePreloader();
+
+  if (!imagesLoaded) {
+    return <LoadingScreen progress={loadingProgress} />;
+  }
 
   return (
     <div className="w-full min-h-screen overflow-y-auto overflow-x-hidden">
