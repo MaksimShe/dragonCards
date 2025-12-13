@@ -6,12 +6,13 @@ import { shuffledCards } from "@/utils/shuffleCards";
 import { riskTypes } from "@/types/RiskTypes";
 import { GameStatus } from "@/types/GameStatus";
 import { SoundTypes } from "@/types/SoundTypes";
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import cn from "classnames";
 import Image from "next/image";
 
 export const HiddenCards = () => {
   const [flippedCards, setFlippedCards] = useState<boolean[]>(Array(6).fill(false));
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]); // Изменено
 
   const { gameStatus, hiddenCardsOrder, setHiddenCardsOrder, risk, bet, addToBalance } = useGameStore();
   const { calculateWin } = useStartGame();
@@ -20,7 +21,14 @@ export const HiddenCards = () => {
   const cardBackside = getImage('backface');
   const cardsHidden = Array(6).fill(cardBackside);
 
+  const clearTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
+
   useEffect(() => {
+    clearTimeouts();
+
     if (hiddenCardsOrder.length > 0) {
       hiddenCardsOrder.forEach((src) => {
         const img = new window.Image();
@@ -31,16 +39,19 @@ export const HiddenCards = () => {
 
   useEffect(() => {
     if (gameStatus === GameStatus.process) {
-      playSound(SoundTypes.reveal)
+      playSound(SoundTypes.reveal);
       setFlippedCards(Array(6).fill(false));
 
-      const newCards = shuffledCards();
-      setHiddenCardsOrder(newCards);
+      const t = setTimeout(() => { // Убрал window.
+        setHiddenCardsOrder(shuffledCards());
+      }, 500);
+
+      timeoutsRef.current.push(t);
     }
 
     if (gameStatus === GameStatus.opening) {
       flippedCards.forEach((_, index) => {
-        setTimeout(() => {
+        const t = setTimeout(() => { // Убрал window.
           playSound(SoundTypes.cardFlip);
           setFlippedCards(prev => {
             const newFlipped = [...prev];
@@ -48,13 +59,15 @@ export const HiddenCards = () => {
             return newFlipped;
           });
         }, index * 250);
+
+        timeoutsRef.current.push(t);
       });
     }
 
     if (gameStatus === GameStatus.opened) {
       const result = calculateWin();
       if (result.includes(2) && !result.includes(0)) {
-        playSound(SoundTypes.reward)
+        playSound(SoundTypes.reward);
         const multipliers = result.reduce((acc, item, index) => {
           if (item === 2) {
             acc.push(riskTypes[risk][index]);
@@ -65,9 +78,11 @@ export const HiddenCards = () => {
         const winSum = (multipliers.reduce((acc, i) => acc + i * bet, 0));
         addToBalance(winSum);
       } else {
-        playSound(SoundTypes.result)
+        playSound(SoundTypes.result);
       }
     }
+
+    return clearTimeouts;
   }, [gameStatus]);
 
 
