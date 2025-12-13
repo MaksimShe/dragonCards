@@ -10,7 +10,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress }) => {
   return (
     <div className="fixed inset-0 bg-[var(--background)] flex flex-col items-center justify-center z-50">
       <div className="flex flex-col items-center gap-6">
-        <Image src={logoImg} alt="loadingImg" width={180} height={70} priority/>
+        <Image src={logoImg} alt="loadingImg" width={192} height={80} priority className="h-20 w-48"/>
         <h1 className="text-4xl font-bold text-[var(--main-text-color)] font-['MedievalSharp']">
           Dragon Cards
         </h1>

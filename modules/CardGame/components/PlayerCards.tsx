@@ -33,14 +33,21 @@ export const PlayerCards = () => {
       userCardsSwipe(draggedIndex, dropIndex);
     }
 
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+    handleDragEnd();
   };
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
     setDragOverIndex(null);
   };
+
+  const isActiveIndex = (index: number) => {
+    return draggedIndex === index;
+  }
+
+  const isActiveOverIndex = (index: number) => {
+    return dragOverIndex === index;
+  }
 
   return (
     <div className="grid grid-cols-6 gap-3">
@@ -50,8 +57,8 @@ export const PlayerCards = () => {
             key={index}
             className={cn("relative w-full aspect-[1/2] cursor-grab active:cursor-grabbing transition-all",
               {
-                'opacity-50 scale-95': draggedIndex === index,
-                'scale-105' : dragOverIndex === index,
+                'opacity-50 scale-95': isActiveIndex(index),
+                'scale-105' : isActiveOverIndex(index),
               })
             }
             draggable

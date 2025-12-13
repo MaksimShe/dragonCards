@@ -1,17 +1,16 @@
-import {getImage} from "@/utils/getImage";
-import {useEffect, useState} from "react";
-import {useGameStore} from "@/store/useGameStore";
-import {GameStatus} from "@/types/GameStatus";
-import {shuffledCards} from "@/utils/shuffleCards";
+import { useGameStore } from "@/store/useGameStore";
+import { useStartGame } from "@/hooks/useStartGame";
+import { useSoundManager } from "@/hooks/useSoundManager";
+import { getImage } from "@/utils/getImage";
+import { shuffledCards } from "@/utils/shuffleCards";
+import { riskTypes } from "@/types/RiskTypes";
+import { GameStatus } from "@/types/GameStatus";
+import { SoundTypes } from "@/types/SoundTypes";
+import { useEffect, useState } from "react";
 import cn from "classnames";
 import Image from "next/image";
-import {useStartGame} from "@/hooks/useStartGame";
-import {riskTypes} from "@/types/RiskTypes";
-import {useSoundManager} from "@/hooks/useSoundManager";
-import {SoundTypes} from "@/types/SoundTypes";
 
 export const HiddenCards = () => {
-  const [componentKey, setComponentKey] = useState(0);
   const [flippedCards, setFlippedCards] = useState<boolean[]>(Array(6).fill(false));
 
   const { gameStatus, hiddenCardsOrder, setHiddenCardsOrder, risk, bet, addToBalance } = useGameStore();
@@ -37,21 +36,6 @@ export const HiddenCards = () => {
 
       const newCards = shuffledCards();
       setHiddenCardsOrder(newCards);
-
-      const preloadPromises = newCards.map((src) => {
-        return new Promise<void>((resolve) => {
-          const img = new window.Image();
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-          img.src = src;
-        });
-      });
-
-      Promise.all(preloadPromises).then(() => {
-        setTimeout(() => {
-          setComponentKey(prev => prev + 1);
-        }, 100);
-      });
     }
 
     if (gameStatus === GameStatus.opening) {
@@ -88,7 +72,7 @@ export const HiddenCards = () => {
 
 
   return (
-    <div className="grid grid-cols-6 gap-3" key={componentKey}>
+    <div className="grid grid-cols-6 gap-3">
       {
         cardsHidden.map((card, index) => (
           <div

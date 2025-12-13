@@ -4,9 +4,9 @@ import { bntStatus } from "@/utils/bntStatus";
 import { SoundTypes } from "@/types/SoundTypes";
 import cn from "classnames";
 
-export const RiskControls = () => {
-  const riskControlBtns = ['Low', 'Medium', 'High', 'Classic'];
+const riskControlBtns = ['Low', 'Medium', 'High', 'Classic'];
 
+export const RiskControls = () => {
   const { risk, setRisk, gameStatus } = useGameStore();
   const { playSound } = useSoundManager();
 
@@ -14,7 +14,10 @@ export const RiskControls = () => {
     playSound(SoundTypes.bet);
     setRisk(index)
   }
-  console.log(risk);
+
+  const isSelected = (index: number) => {
+    return risk === index;
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -28,8 +31,8 @@ export const RiskControls = () => {
               "h-8 bg-[var(--button-bg)] ",
               "flex flex-1 items-center justify-center rounded-md",
               {
-                "bg-[var(--button-hover)] text-[var(--button-bg-active)]" : index === risk,
-                "hover:bg-[var(--button-hover)] hover:text-[var(--button-text-hover)] text-[var(--secondary-text-color)]" : index !== risk,
+                "bg-[var(--button-hover)] text-[var(--button-bg-active)]" : isSelected(index),
+                "hover:bg-[var(--button-hover)] hover:text-[var(--button-text-hover)] text-[var(--secondary-text-color)]" : !isSelected(index),
                 "opacity-75": bntStatus(gameStatus)
               }
             )}

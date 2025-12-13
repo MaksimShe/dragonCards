@@ -5,14 +5,16 @@ import { bntStatus } from "@/utils/bntStatus";
 import { SoundTypes } from "@/types/SoundTypes";
 import { ChangeEvent, useEffect } from "react";
 import cn from "classnames";
+import { BetBtnsEnum } from "@/types/BetBtnsEnum";
 
 const MAX_BET = 1000;
 export const MIN_BET = 10;
+const betControlBtns =
+  [BetBtnsEnum.half, BetBtnsEnum.double, BetBtnsEnum.max];
 
 export const BetControls = () => {
   const { bet, setBet, balance, gameStatus } = useGameStore();
   const { playSound } = useSoundManager();
-  const betControlBtns = ['1/2', 'x2', 'Max']
 
   useEffect(() => {
     if (bet > balance) {
@@ -51,18 +53,17 @@ export const BetControls = () => {
     playSound(SoundTypes.bet);
 
     switch(action) {
-      case '1/2':
+      case BetBtnsEnum.half:
         newBet = Math.max(MIN_BET, bet / 2);
         break;
-      case 'x2':
+      case BetBtnsEnum.double:
         newBet = Math.min(MAX_BET, balance, bet * 2);
         break;
-      case 'Max':
+      case BetBtnsEnum.max:
         newBet = Math.min(MAX_BET, balance);
         break;
     }
-
-    setBet(+roundMoney(newBet));
+    setBet(roundMoney(newBet));
   }
 
   return (
